@@ -1,6 +1,10 @@
+import { Pet } from "@/lib/type";
 import Image from "next/image";
 
-export default function PetList({ pets }) {
+type PetListProps = {
+ pets: Pet[];
+}
+export default function PetList({ pets }: PetListProps) {
   return (
     <ul className="bg-white border-b border-black/[0.08] ">
       {pets.map((pet) => (
@@ -17,7 +21,6 @@ export default function PetList({ pets }) {
           </button>
         </li>
       ))}
-
     </ul>
   );
 }

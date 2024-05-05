@@ -2,6 +2,7 @@
 
 import { createContext, useState } from "react";
 import { Pet } from "../lib/type";
+import { addPet } from "@/actions/actions";
 
 type PetContextProviderProps = {
   data: Pet[];
@@ -48,14 +49,16 @@ const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => {
     );
 }
 
-  const handleAddPet = (newPet: Omit<Pet, "id">) => {
-    setPets((prev) => [
+  const handleAddPet = async (newPet: Omit<Pet, "id">) => {
+    // previous approach with context api
+/*     setPets((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
         ...newPet,
       },
-    ]);
+    ]); */
+    await addPet(newPet);
   };
   const handleCheckoutPet = (id: string) => {
     setPets((prev) => prev.filter((pet) => pet.id !== id));

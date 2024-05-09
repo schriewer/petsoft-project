@@ -7,6 +7,8 @@ import { Button } from "./ui/button";
 import { usePetContext } from "@/lib/hooks";
 import { Pet } from "../lib/type";
 import { addPet } from "@/actions/actions";
+import { useForm } from "react-hook-form";
+import PetFormBtn from "./pet-form-btn";
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -43,6 +45,9 @@ export default function PetForm({
     }
     onFormSubmission();
   }; */
+
+  // adding react-hook-form from video 321
+  const {} = useForm();
 
   return (
     <form
@@ -108,9 +113,7 @@ export default function PetForm({
         </div>
       </div>
 
-      <Button type="submit" className="mt-5 self-end">
-        {actionType === "add" ? "Add a new pet" : "Edit pet"}
-      </Button>
+      <PetFormBtn actionType={actionType} />
     </form>
   );
 }

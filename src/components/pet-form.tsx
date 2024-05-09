@@ -6,6 +6,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { usePetContext } from "@/lib/hooks";
 import { Pet } from "../lib/type";
+import { addPet } from "@/actions/actions";
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -15,9 +16,13 @@ export default function PetForm({
   actionType,
   onFormSubmission,
 }: PetFormProps) {
-  const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
+  // const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
+  const { selectedPet } = usePetContext();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  /*  
+    // previous version before video 305, where we use onSubmit attribute with the form
+ 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -37,10 +42,16 @@ export default function PetForm({
       handleEditPet(selectedPet!.id, pet);
     }
     onFormSubmission();
-  };
+  }; */
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form
+      action={async (FormData) => {
+        await addPet(FormData);
+        onFormSubmission();
+      }}
+      className="flex flex-col"
+    >
       <div className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="name">Name</Label>

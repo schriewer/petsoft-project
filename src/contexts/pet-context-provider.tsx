@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useState } from "react";
-import { Pet } from "../lib/type";
+import { Pet } from "@/lib/type";
 import { addPet } from "@/actions/actions";
 
 type PetContextProviderProps = {
@@ -23,11 +23,12 @@ type TPetContext = {
 export const PetContext = createContext<TPetContext | null>(null);
 
 export default function PetContextProvider({
-  data,
+  data: pets,
   children,
 }: PetContextProviderProps) {
   // state
-  const [pets, setPets] = useState(data);
+  // before: changing to server actions and revalidatePath(.....) in action.ts
+  // const [pets, setPets] = useState(data);
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // derived state
@@ -35,7 +36,11 @@ export default function PetContextProvider({
   const numberOfPets = pets.length;
 
   // event handlers / actions to update state
-const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => {
+  const handleAddPet = async (newPet: Omit<Pet, "id">) => {
+    await addPet(newPet);
+  };
+
+  const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => {
     setPets((prev) =>
       prev.map((pet) => {
         if (pet.id === petId) {
@@ -47,19 +52,8 @@ const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => {
         return pet;
       })
     );
-}
-
-  const handleAddPet = async (newPet: Omit<Pet, "id">) => {
-    // previous approach with context api
-/*     setPets((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        ...newPet,
-      },
-    ]); */
-    await addPet(newPet);
   };
+
   const handleCheckoutPet = (id: string) => {
     setPets((prev) => prev.filter((pet) => pet.id !== id));
     setSelectedPetId(null);

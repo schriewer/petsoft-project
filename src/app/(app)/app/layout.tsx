@@ -4,6 +4,7 @@ import BackgroundPattern from "@/components/background-pattern";
 import PetContextProvider from "../../../contexts/pet-context-provider";
 import SearchContextProvider from "@/contexts/search-context-provider";
 import prisma from "@/lib/db";
+import { Toaster } from "@/components/ui/sonner";
 // Import method required for importing data from a web API
 // import { Pet } from "@/lib/type";
 
@@ -39,6 +40,8 @@ const pets = await prisma.pet.findMany();
 
         <AppFooter />
       </div>
+
+      <Toaster position={"top-right"} />
     </>
   );
 }

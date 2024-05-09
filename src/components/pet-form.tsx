@@ -12,6 +12,8 @@ import PetFormBtn from "./pet-form-btn";
 import { toast } from "sonner";
 import { useFormState } from "react-dom";
 import { Span } from "next/dist/trace";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type TPetForm = {
   name: string;
@@ -20,6 +22,18 @@ type TPetForm = {
   age: string;
   notes: string;
 };
+
+const petFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Name is required" })
+    .max(100, { message: "Name is too long" }),
+  ownerName: z.string().min(2).max(100),
+  imageUrl: z.union([z.literal(''), z.string().url({ message: "must be a valid URL" })]),
+  age: z.number().int().positive().max(30),
+  notes: z.union([z.literal(""), z.string().trim().max(1000)]),
+});
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -62,7 +76,9 @@ export default function PetForm({
     register,
     trigger,
     formState: { isSubmitting, errors },
-  } = useForm<TPetForm>();
+  } = useForm<TPetForm>({
+    resolver: zodResolver(petFormSchema),
+  });
 
   return (
     <form

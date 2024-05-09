@@ -11,6 +11,15 @@ import { useForm } from "react-hook-form";
 import PetFormBtn from "./pet-form-btn";
 import { toast } from "sonner";
 import { useFormState } from "react-dom";
+import { Span } from "next/dist/trace";
+
+type TPetForm = {
+  name: string;
+  ownerName: string;
+  imageUrl: string;
+  age: string;
+  notes: string;
+};
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -49,11 +58,20 @@ export default function PetForm({
   }; */
 
   // adding react-hook-form from video 321
-  const {} = useForm();
+  const {
+    register,
+    trigger,
+    formState: { isSubmitting, errors },
+  } = useForm<TPetForm>();
 
   return (
     <form
       action={async (FormData) => {
+        const result = await trigger();
+        if (!result) {
+          return;
+        }
+
         if (actionType === "add") {
           const error = await addPet(FormData);
           if (error) {
@@ -61,7 +79,7 @@ export default function PetForm({
             return;
           }
         } else if (actionType === "edit") {
-          const error = await editPet(selectedPet?.id ,FormData);
+          const error = await editPet(selectedPet?.id, FormData);
           if (error) {
             toast.warning(error.message);
             return;
@@ -76,54 +94,48 @@ export default function PetForm({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            name="name"
-            type="text"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.name : ""}
+            {...register("name", {
+              required: "Name is required",
+              minLength: { value: 2, message: "Name is too short" },
+            })}
           />
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
         </div>
 
         <div>
           <Label htmlFor="ownerName">Owner name</Label>
           <Input
             id="ownerName"
-            name="ownerName"
-            type="text"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.ownerName : ""}
+            {...register("ownerName", {
+              required: "Owner name is required",
+              maxLength: { value: 5, message: "Owner name is too long" },
+            })}
           />
+          {errors.ownerName && (
+            <p className="text-red-500">{errors.ownerName.message}</p>
+          )}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="imageUrl">Image Url</Label>
-          <Input
-            id="imageUrl"
-            name="imageUrl"
-            type="text"
-            defaultValue={actionType === "edit" ? selectedPet?.imageUrl : ""}
-          />
+          <Input id="imageUrl" {...register("imageUrl")} />
+          {errors.imageUrl && (
+            <p className="text-red-500">{errors.imageUrl.message}</p>
+          )}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="age">Age</Label>
-          <Input
-            id="age"
-            name="age"
-            type="number"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.age : ""}
-          />
+          <Input id="age" {...register("age")} />
+          {errors.age && <p className="text-red-500">{errors.age.message}</p>}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            name="notes"
-            rows={3}
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.notes : ""}
-          />
+          <Textarea id="notes" {...register("notes")} />
+          {errors.notes && (
+            <p className="text-red-500">{errors.notes.message}</p>
+          )}
         </div>
       </div>
 

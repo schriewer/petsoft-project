@@ -14,14 +14,9 @@ import { useFormState } from "react-dom";
 import { Span } from "next/dist/trace";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 
-type TPetForm = {
-  name: string;
-  ownerName: string;
-  imageUrl: string;
-  age: string;
-  notes: string;
-};
+
 
 const petFormSchema = z.object({
   name: z
@@ -31,9 +26,13 @@ const petFormSchema = z.object({
     .max(100, { message: "Name is too long" }),
   ownerName: z.string().min(2).max(100),
   imageUrl: z.union([z.literal(''), z.string().url({ message: "must be a valid URL" })]),
-  age: z.number().int().positive().max(30),
+  age: z.coerce.number().int().positive().max(99999),
   notes: z.union([z.literal(""), z.string().trim().max(1000)]),
-});
+}).transform((data) => ({
+  ...data,
+  imageUrl: data.imageUrl || DEFAULT_PET_IMAGE,}));
+
+type TPetForm = z.infer<typeof petFormSchema>;
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -75,7 +74,8 @@ export default function PetForm({
   const {
     register,
     trigger,
-    formState: { isSubmitting, errors },
+    getValues,
+    formState: { errors },
   } = useForm<TPetForm>({
     resolver: zodResolver(petFormSchema),
   });
@@ -87,6 +87,11 @@ export default function PetForm({
         if (!result) {
           return;
         }
+
+        onFormSubmission();
+
+        const petData = getValues();
+        petData.imageUrl = petData.imageUrl || DEFAULT_PET_IMAGE;
 
         if (actionType === "add") {
           const error = await addPet(FormData);

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState } from "react";
+import { createContext, useOptimistic, useState } from "react";
 import { Pet } from "@/lib/type";
 import { addPet } from "@/actions/actions";
 
@@ -23,17 +23,18 @@ type TPetContext = {
 export const PetContext = createContext<TPetContext | null>(null);
 
 export default function PetContextProvider({
-  data: pets,
+  data,
   children,
 }: PetContextProviderProps) {
   // state
   // before: changing to server actions and revalidatePath(.....) in action.ts
   // const [pets, setPets] = useState(data);
+  const [optimisticPets, setOptimisticPets] = useOptimistic(data);
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // derived state
-  const selectedPet = pets.find((pet) => pet.id === selectedPetId);
-  const numberOfPets = pets.length;
+  const selectedPet = optimisticPets.find((pet) => pet.id === selectedPetId);
+  const numberOfPets = optimisticPets.length;
 
   // event handlers / actions to update state
   const handleAddPet = async (newPet: Omit<Pet, "id">) => {

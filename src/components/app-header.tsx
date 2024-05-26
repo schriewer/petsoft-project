@@ -35,7 +35,7 @@ export default function AppHeader() {
                     }
                 )}
               >
-                {route.label}{" "}
+                {route.label}
               </Link>
             </li>
           ))}
